@@ -1,0 +1,84 @@
+GET http://localhost:5050/posts?page=1 HTTP/1.1
+
+####
+GET http://localhost:5050/posts/652821509b1f110791840648 HTTP/1.1
+
+####
+POST http://localhost:5050/posts/create HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "POST 4",
+    "category": "Categoria 3",
+    "cover": "https://static.vecteezy.com/system/resources/thumbnails/000/192/818/small/T_3-01.jpg",
+    "content": "test prova content 4",
+    "readTime": {
+        "value": 12,
+        "unit": "minuti"
+    },
+    "author": "6527bec3dfc84169df4d35d8"
+}
+
+####
+PATCH http://localhost:5050/posts/update/652821509b1f110791840648 HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "POST 1 mod",
+    "category": "Categoria 1",
+    "cover": "https://static.vecteezy.com/system/resources/thumbnails/000/192/818/small/T_3-01.jpg",
+    "content": "test prova content MOD",
+    "readTime": {
+        "value": 5,
+        "unit": "minuti"
+    }
+}
+
+####
+DELETE http://localhost:5050/posts/delete/652825a870fbd293372b9404 HTTP/1.1
+
+
+
+
+####
+GET http://localhost:5050/users HTTP/1.1
+
+####
+POST http://localhost:5050/users/create HTTP/1.1
+Content-Type: application/json
+
+{
+  "firstName": "Nik",
+  "lastName": "Rossi",
+  "email": "nikrossi@gmail.com",
+  "password": "6asfdf4465464"
+}
+
+
+
+
+####
+GET http://localhost:5050/posts/652821509b1f110791840648/comments HTTP/1.1
+
+####
+GET http://localhost:5050/posts/652821509b1f110791840648/comments/65297a1ddfefdc68929f1e03 HTTP/1.1
+
+####
+POST  http://localhost:5050/posts/652821509b1f110791840648/comments/create HTTP/1.1
+Content-Type: application/json
+
+{
+  "comment": "prova commento 3",
+  "rate": 5,
+  "author": "65281f33a2a7d8d9f9e4e99f"
+}
+
+####
+PATCH   http://localhost:5050/posts/652821509b1f110791840648/comments/update/65297ef84ab55d61d6c540a8 HTTP/1.1
+Content-Type: application/json
+
+{
+  "comment": "prova commento 3 MOD",
+  "rate": 1,
+  "author": "65281f33a2a7d8d9f9e4e99f"
+}
