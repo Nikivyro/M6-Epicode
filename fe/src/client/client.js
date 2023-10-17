@@ -1,5 +1,4 @@
 import axios from "axios";
-
 class AxiosClient {
     constructor(){
         const baseURL = `${process.env.REACT_APP_URL_ENDPOINT}`

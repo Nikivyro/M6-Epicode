@@ -1,4 +1,5 @@
 import React from 'react';
+import EditPostModal from './EditPostModal';
 
 export default function SinglePost({ _id, title, cover, category, author, rate, readTime }) {
   return (
@@ -19,6 +20,7 @@ export default function SinglePost({ _id, title, cover, category, author, rate, 
           <p>{readTime.unit}</p>
         </>
       )}
+      <EditPostModal postId={_id}/>
     </div>
   );
 }

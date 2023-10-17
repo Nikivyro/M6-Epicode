@@ -7,8 +7,85 @@ const multer = require('multer')
 const cloudinary = require('cloudinary').v2
 const { CloudinaryStorage } = require('multer-storage-cloudinary')
 
-require('dotenv').config
+require('dotenv').config()
 const crypto = require('crypto')
+
+// Congif Cloaudinary
+cloudinary.config({ 
+    cloud_name: `${process.env.CLOUDINARY_CLOUD_NAME}`, 
+    api_key: `${process.env.CLOUDINARY_API_KEY}`, 
+    api_secret: `${process.env.CLOUDINARY_API_SECRET}`
+});
+
+const cloudStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'public-cloud',
+        format: async (req, file) => 'png',
+        public_id: (req, file) => file.name
+    }
+})
+
+//Config Multer
+const internalStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        // posizione in cui salvare i file
+        cb(null, './public')
+    },
+    filename: (req, file, cb) => {
+        // generiamo un suffisso unico per il nostro file
+        const uniqueSuffix = `${Date.now()}-${crypto.randomUUID()}`
+        // qui ci recuperiamo da tutto solo l'estensione dello stesso file
+        const fileExtension = file.originalname.split('.').pop()
+        // eseguiamo la cb con il titolo completo
+        cb(null, `${file.fieldname}-${uniqueSuffix}.${fileExtension}`)
+    }
+})
+
+const upload = multer({ storage: internalStorage })
+const cloudUpload = multer({ storage: cloudStorage })
+
+
+// POST COVER CON CLOUD
+posts.post('/posts/cloudUpload', cloudUpload.single('cover'), async (req, res) => {
+    try {
+        // Effettua l'upload dell'immagine su Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        if (result && result.secure_url) {
+            const imageURL = result.secure_url;
+            res.status(200).json({ cover: imageURL });
+        } else {
+            res.status(500).send({
+                statusCode: 500,
+                message: "Errore nell'upload dell'immagine su Cloudinary"
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            statusCode: 500,
+            message: "Errore interno del server"
+        });
+    }
+});
+// POST COVER CON MULTER
+posts.post('/posts/upload', upload.single('cover')  , async (req, res) => {
+    const url = `${req.protocol}://${req.get('host')}` // http://localhost:5050
+
+    console.log(req.file)
+
+    try {
+        const imgUrl = req.file.filename;
+        res.status(200).json({ cover: `${url}/public/${imgUrl}` })
+    } catch (e) {
+        res.status(500).send({
+            statusCode: 500,
+            message: "Errore interno del server"
+        })
+    }
+
+})
 
 // GET ALL
 posts.get('/posts', async (req, res)=> {

@@ -39,7 +39,7 @@ export default function LatestPosts() {
   }, [currentPage, pageSize])
 
   return (
-    <div class="container mx-auto my-3">
+    <div className="container mx-auto my-3">
       <div className='grid grid-cols-2 gap-2'>
         <div className='w-25'>
           <button 
@@ -59,7 +59,7 @@ export default function LatestPosts() {
           </select>
         </div>
       </div>
-      <div class="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {posts && posts.posts?.map((post) => (
           <SinglePost
             {...post}
@@ -71,10 +71,10 @@ export default function LatestPosts() {
             // author={post.author}
             // readTime={post.readTime}
           />
-        ))}
+          ))}
       </div>
       {isModalOpen && (
-          <AddPostModal closeModal={setIsModalOpen} />
+        <AddPostModal closeModal={setIsModalOpen} />
       )}
       <ResponsivePagination
         current={currentPage}

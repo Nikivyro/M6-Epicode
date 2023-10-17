@@ -1,0 +1,97 @@
+// Creazione PATCH della cover /posts/:postId/cover
+// Creazione upload user tramite cloudinary e PATCH  /user/:userId/avatar  
+// EXTRA Creazione middleware e rotta che invia la mail alla creazione di un nuovo post
+
+// Creare logica di Registrazione e Login con token e le pagine sono accessibili solo tramite token autorizzato JWT
+// Creare login una Strategy di OAuth possibilmente con Google o altri
+GET /login
+GET /me
+
+
+// Fare una GET dei post relativi agli USER - GET user/:userId/posts
+// Fare un GET che restituisce ad una query che si da nel parametro Title - GET /posts/?title=NomePost
+
+
+MONGO DB
+
+epicode_admin
+anZfFRlQnH04kTRs
+
+mongodb+srv://epicode_admin:anZfFRlQnH04kTRs@epicluster.sbhcnb4.mongodb.net/
+
+======================================================================
+
+Su cloudinary.com
+CloudName: dtbjkoenz
+APIKey: 279892698117579
+API Secret: ygtQBxenW8Sy1l4mj_q64__jxdU
+
+node.js
+npm install cloudinary
+import {v2 as cloudinary} from 'cloudinary';
+          
+cloudinary.config({ 
+  cloud_name: 'dtbjkoenz', 
+  api_key: '279892698117579', 
+  api_secret: 'ygtQBxenW8Sy1l4mj_q64__jxdU' 
+});
+
+==========================================================
+
+Login con OAuth
+
+CLIENT ID 9490fb80961f687829a7
+CLIENT SECRET f346f42151f7503ccf61a774b7ec351a3b801979
+CALLBACK URL http://localhost:5050/auth/github/callback
+
+FE:
+Librerie:
+- passport
+- passport js (Provider da poter utilizzare come Google, FB etc..)
+- npm i passport passport-github2 express-session
+Express session gestisce tutte le sessioni degli utenti e tutte le request di 
+chi logga per evitare duplicazionio
+-github2 è il provider scelto
+
+C'è da creare una rotta per gestire il login e creare le rotte che gestiscono i 
+reindirizzamente del provider che si utilizzare
+
+BE:
+Creare un button per il login
+creare una funzione redirect per il login
+windows.location.href=indirizzo server/ rotta login github
+darlo sul click il redirect
+
+
+
+
+#LOGIN E JWT TOKEN (json web token)
+
+header payload signature (appunti su epicode)
+
+BCrypt per cryptazione password
+
+1. npm i bcrypt jsonwebtoken nel BE
+2. Pulire vecchi utenti per le password in chiaro
+3. Nella rotta degli utenti nella POST su fa il cryptaggio della password
+4. importare bcrypt con il require
+5. req.body.password -> avrà hashed.password
+
+per LOGIN
+1. creare rotta "login" e fare una POST
+2. cercare l'user se esiste con il findOne nel UserModel cercando per il email: req.body.email
+3. validare la password con il compare di bcrypt req.body.passowrd e la mail dell'utente da cercare user.passowrd
+4. generare il token di accesso con le info necessarie
+5. nel file .env creare una variabile JWT_SECRET con dei caratteri che saranno usati per generare il token
+6. includere dotenv
+7. token = jwt.sign({ all'interno tutte le info che si vogliono inserire nel token da decifrare, ovviamente non dati sensibili}, process.env.JWT_SECRET{expire token time es 24h})
+8. crazione middleware per controllare verifica il token
+9. il middleware dovrai metterlo sui metodi che vuoi proteggere tramite token
+
+per il FE
+
+1. creare una page con il Login con email e passowrd e salvare i token nel sessionStorage
+2. creare una ProtectedRoutes come middleware nel BE per controllare se è un utente autorizzato
+3. libreria per le Protected npm i jwt-decode
+4. controllo se nel localstorage c'è il loggedUser e un return di booleano se si è autorizzati
+5. con un custom hook controlliamo se siamo autorizzati

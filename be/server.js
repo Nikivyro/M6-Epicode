@@ -3,16 +3,17 @@ const mongoose = require('mongoose')
 const logger = require('./middlewares/logger')
 const postsRoute = require('./routes/posts')
 const usersRoute = require('./routes/users')
+const loginRoute = require('./routes/login')
 // const emailRoute = require('./routes/sendEmail')
 const cors = require('cors')
-// const path = require('path')
+const path = require('path')
 require('dotenv').config()
 const PORT = 5050;
 
 
 const app = express();
 
-// app.use('/public', express.static(path.join(__dirname, 'public')))
+app.use('/public', express.static(path.join(__dirname, 'public')))
 
 // middleware parser json
 app.use(cors())
@@ -22,6 +23,7 @@ app.use(logger)
 // routes
 app.use('/', postsRoute)
 app.use('/', usersRoute)
+app.use('/', loginRoute)
 // app.use('/', emailRoute)
 
 

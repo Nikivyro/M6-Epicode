@@ -1,33 +1,81 @@
-import React, { useState } from 'react'
-import AxiosClient from '../client/client'
-const client = new AxiosClient()
+import React, { useState } from 'react';
+import AxiosClient from '../client/client';
+const client = new AxiosClient();
 
 export default function AddPostModal({ closeModal }) {
-    const [formData, setFormData] = useState({})
-    
-    console.log(formData)
+    const [formData, setFormData] = useState({});
+    const [file, setFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null); // Aggiunto stato per l'anteprima dell'immagine
+
+    const onChangeSetFile = (e) => {
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
+        // Mostra un'anteprima dell'immagine
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(selectedFile);
+    }
+
+    const uploadFile = async (cover) => {
+        const fileData = new FormData();
+        fileData.append('cover', cover);
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_URL_ENDPOINT}/posts/cloudUpload`, {
+                method: "POST",
+                body: fileData
+            });
+            return await response.json();
+        } catch (error) {
+            console.error(error, 'Errore in uploadFile');
+            throw error;
+        }
+    }
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        // Parse the readTime input values as numbers
-        const readTimeValue = Number(formData.readTimeValue);
-        // Set readTime as an object with value and unit
-        const readTimeUnit = formData.readTimeUnit || 'minuti'; // Set a default unit if necessary
-        const readTime = { value: readTimeValue, unit: readTimeUnit };
-        // Remove readTimeValue and readTimeUnit from formData
-        const { readTimeValue: _, readTimeUnit: __, ...restData } = formData;
-        
-        const postData = {
-            ...restData,
-            readTime,
-        };
 
         try {
-            return await client.post('/posts/create', postData);
-            // Handle the response as needed
+            if (!file) {
+                console.error('Caricare almeno un file');
+                return;
+            }
+
+            // Upload del file
+            const uploadCover = await uploadFile(file);
+            console.log(uploadCover);
+
+            // Parse the readTime input values as numbers
+            const readTimeValue = Number(formData.readTimeValue);
+            // Set readTime as an object with value and unit
+            const readTimeUnit = formData.readTimeUnit || 'minuti';
+            const readTime = { value: readTimeValue, unit: readTimeUnit };
+            const { readTimeValue: _, readTimeUnit: __, ...restData } = formData;
+
+            const postData = {
+                ...restData,
+                readTime,
+                cover: uploadCover.cover
+            };
+
+            const response = await fetch(`${process.env.REACT_APP_URL_ENDPOINT}/posts/create`, {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                method: 'POST',
+                body: JSON.stringify(postData)
+            });
+
+            if (response.ok) {
+                closeModal(false); // Chiudi il modal se la richiesta è andata a buon fine
+            } else {
+                console.error('Errore nella richiesta di creazione del post.');
+            }
         } catch (error) {
             console.error(error);
-            // Handle the error as needed
+            // Gestisci l'errore come necessario
         }
     };
 
@@ -61,15 +109,15 @@ export default function AddPostModal({ closeModal }) {
                                 category: e.target.value
                             })}
                         />
+                        {/* Mostra l'anteprima dell'immagine se disponibile */}
+                        {imagePreview && (
+                            <img src={imagePreview} alt="Anteprima immagine" style={{ maxWidth: "100%" }} />
+                        )}
                         <input
-                            placeholder='Cover post'
                             className="w-[400px] p-1 rounded"
                             name="cover"
-                            type="text"
-                            onChange={(e) => setFormData({
-                                ...formData,
-                                cover: e.target.value
-                            })}
+                            type="file"
+                            onChange={onChangeSetFile}
                         />
                         <input
                             placeholder='Tempo di lettura (valore)'
@@ -112,17 +160,16 @@ export default function AddPostModal({ closeModal }) {
                             type="text"
                             onChange={(e) => setFormData({
                                 ...formData,
-                                author:e.target.value
+                                author: e.target.value
                             })}
                         />
-                        <input
-                            placeholder='messaggio...'
+                        <textarea
+                            placeholder='Messaggio...'
                             className="w-[400px] p-1 rounded"
-                            name="author"
-                            type="textarea"
+                            name="content"
                             onChange={(e) => setFormData({
                                 ...formData,
-                                content:e.target.value
+                                content: e.target.value
                             })}
                         />
                         <div className="flex gap-2">
